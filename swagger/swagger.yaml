@@ -1,0 +1,608 @@
+swagger: "2.0"
+info:
+  title: Sample API
+  description: API description in Markdown.
+  version: 1.0.0
+basePath: /
+schemes:
+  - http
+paths:
+  /api/login:
+    post:
+      summary: Authenticates user and returns Bearer login token
+      operationId: "Login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/auth"
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/auth_token"
+        "401":
+            description: "Incorrect username or password"
+            schema:
+                $ref: "#/definitions/auth_wrong_password"
+  /api/pickups:
+    get:
+      summary: Returns list of medical pickups
+      operationId: getPickups
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: pickup_status
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: scheduled_before
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/pickupList"
+  /api/pickup:
+    get:
+      summary: Returns list of medical pickups
+      operationId: getPickup
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: pickup_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/pickup"
+        "400":
+            schema:
+                $ref: "#/definitions/pick_up_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/pickup_id_not_found"
+  /api/pickup/status:
+    patch:
+      summary: Updates pickup status
+      operationId: updatePickupStatus
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: pickup_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: body
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: string
+                example: "AWAITING_CONFIRMATION"
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/pickup_status_update_success"
+        "400":
+            schema:
+                $ref: "#/definitions/pick_up_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/pickup_id_not_found"
+  /api/pickup/authorised:
+    get:
+      summary: Returns list of requiremetns and whether or not those requirements have been pet
+      operationId: getAutherised
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: pickup_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/authorised"
+        "400":
+            schema:
+                $ref: "#/definitions/pick_up_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/pickup_id_not_found"
+  /api/test:
+    get:
+      summary: Returns test with provided test ID
+      operationId: getTest
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: test_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/test"
+        "400":
+            schema:
+                $ref: "#/definitions/test_id_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/test_id_not_found"
+  /api/contact:
+    get:
+      summary: Returns contact with provided contact ID
+      operationId: getContact
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: contact_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/contact"
+        "400":
+            schema:
+                $ref: "#/definitions/contact_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/contact_id_not_found"
+  /api/send/sms:
+    post:
+      summary: Send message to patient from pickup id
+      operationId: SendSMS
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: pickup_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: body
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: string
+                example: "Your pickup is ready for collection"
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/pickup_status_update_success"
+        "400":
+            schema:
+                $ref: "#/definitions/pick_up_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/pickup_id_not_found"
+  /api/gp:
+    get:
+      summary: Returns GP with provided GP ID
+      operationId: getGP
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: gp_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/gp"
+        "400":
+            schema:
+                $ref: "#/definitions/gp_id_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/gp_id_not_found"
+  /api/patient:
+    get:
+      summary: Returns patient with provided patient ID
+      operationId: getPatient
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: patient_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/patient"
+        "400":
+            schema:
+                $ref: "#/definitions/patient_id_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/patient_id_not_found"
+  /api/sensitivity:
+    get:
+      summary: Returns sensitivity with provided sensitivity ID
+      operationId: getSensitivity
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: sensitivity_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        "200":
+            schema:
+                $ref: "#/definitions/sensitivity"
+        "400":
+            schema:
+                $ref: "#/definitions/sensitivity_id_parameter_required"
+        "404":
+            schema:
+                $ref: "#/definitions/sensitivity_id_not_found"
+                        
+definitions:
+    auth:
+        type: "object"
+        properties:
+            username:
+                type: "string"
+                example: "admin"
+            password: 
+                type: "string"
+                example: "password"
+
+    auth_token:
+        type: "object"
+        properties:
+            access_token:
+                type: "string"
+                example: "Generated access token"
+                
+    auth_wrong_password:
+        type: "object"
+        properties:
+            error:
+                type: "string"
+                example: "AuthenticationError"
+            message:
+                type: "string"
+                example: "The username and/or password are incorrect"
+            status_code:
+                type: "integer"
+                example: 401
+    pick_up_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: pickup_id"
+            status_code:
+                type: "integer"
+                example: 400
+    pickup_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No pick up with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    contact_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: contact_id"
+            status_code:
+                type: "integer"
+                example: 400
+    contact_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No contact up with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    test_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No test with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    test_id_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: test_id"
+            status_code:
+                type: "integer"
+                example: 400
+    gp_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No GP with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    gp_id_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: gp_id"
+            status_code:
+                type: "integer"
+                example: 400
+    patient_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No patient with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    patient_id_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: patient_id"
+            status_code:
+                type: "integer"
+                example: 400
+    sensitivity_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No sensitivity with that ID could be found"
+            status_code:
+                type: "integer"
+                example: 404
+    sensitivity_id_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: test_id"
+            status_code:
+                type: "integer"
+                example: 400
+    test_items_test_id_not_found:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "No test with provided test ID exists"
+            status_code:
+                type: "integer"
+                example: 404
+    test_items_id_parameter_required:
+        type: "object"
+        properties:
+            message:
+                type: "string"
+                example: "Parameter required: test_id"
+            status_code:
+                type: "integer"
+                example: 400
+    pickup:
+        type: "object"
+        properties:
+          pickup_id:
+              type: "string"
+              example: "UUID of pickup"
+          patient_id:
+              type: "string"
+              example: "UUID of patient"
+          drug_id:
+              type: "string"
+              example: "UUID of patient"
+          drug_quantity:
+              type: "integer"
+              example: 3
+          scheduled_date:
+              type: "date"
+              example: "2021-01-26"
+          review_date:
+              type: "date"
+              example: "2021-01-26"
+          is_authorised:
+              type: "string"
+              example: "authorised"
+          pickup_status:
+              type: "string"
+              example: "AWAITING_PICKUP"
+    test:
+        type: "object"
+        properties:
+          test_id:
+              type: "string"
+              example: "UUID of test"
+          name:
+              type: "string"
+              example: "Aspirin"
+    authorised:
+        type: "object"
+        properties:
+          is_authorised:
+            type: "boolean"
+            example: true
+          requirements:
+            type: array
+            items:
+              type: "object"
+              properties:
+                requirement_id:
+                  type: "string"
+                  example: "requirement uuid"
+                drug_id:
+                  type: "string"
+                  example: "drug uuid"
+                test_id:
+                  type: "string"
+                  example: "test uuid"
+                pharmacist_discretion:
+                  type: "string"
+                  example: "full"
+                minimum_last_test_date:
+                  type: "string"
+                  example: "2021-01-13"
+                requirement_met:
+                  type: "string"
+                  example: "No"
+    contact:
+        type: "object"
+        properties:
+          contact_id:
+              type: "string"
+              example: "UUID of contact"
+          phone_number:
+              type: "string"
+              example: "07123456789"
+          email_address:
+              type: "string"
+              example: "gp@nhs.gov"
+          address_line_1:
+            type: "string"
+            example: "Address line 1"
+          address_line_2:
+            type: "string"
+            example: "Address line 2"
+          address_line_3:
+            type: "string"
+            example: "Address line 3"
+          address_line_4:
+            type: "string"
+            example: "Address line 4"
+          postcode:
+            type: "string"
+            example: "NG11 8NS"
+    gp:
+        type: "object"
+        properties:
+          gp_id:
+              type: "string"
+              example: "UUID of GP"
+          name:
+              type: "string"
+              example: "Monkey medical centre"
+          contact_id:
+              type: "string"
+              example: "UUID of contact"
+    patient:
+        type: "object"
+        properties:
+          patient_id:
+              type: "string"
+              example: "UUID of patient"
+          gp_id:
+              type: "string"
+              example: "UUID of GP"
+          sensitivity_id:
+              type: "string"
+              example: "UUID of sensitivity"
+          forename:
+              type: "string"
+              example: "John"
+          surname:
+              type: "string"
+              example: "Smith"
+          sex:
+              type: "string"
+              example: "M"
+          age:
+              type: "string"
+              example: "51"
+          contact_id:
+              type: "string"
+              example: "UUID of contact"
+    sensitivity:
+        type: "object"
+        properties:
+          sensitivity_id:
+              type: "string"
+              example: "UUID of sensitivity"
+          name:
+              type: "string"
+              example: "Penicillin allergy"
+          description:
+              type: "string"
+              example: "Allergic to Penicillin"
+    pickup_status_update_success:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+          example: "Successfully updated pickup status"
+    pickupList:
+        type: array
+        items:
+          type: "object"
+          properties:
+              pickup_id:
+                type: "string"
+                example: "UUID of pickup"
+              patient_id:
+                type: "string"
+                example: "UUID of patient"
+              drug_id:
+                type: "string"
+                example: "UUID of patient"
+              drug_quantity:
+                type: "integer"
+                example: 3
+              scheduled_date:
+                type: "date"
+                example: "2021-01-26"
+              review_date:
+                type: "date"
+                example: "2021-01-26"
+              is_authorised:
+                type: "string"
+                example: "authorised"
+              pickup_status:
+                type: "string"
+                example: "AWAITING_PICKUP"
